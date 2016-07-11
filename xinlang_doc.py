@@ -13,6 +13,7 @@ class Spider:
 		try:
 			data = open_workbook(fileName)
 			table = data.sheet_by_index(0)
+			self.beginRow  = 1
 			# nrows = table.nrows
 			# if nrows > 0:
 			# 	self.beginRow = nrows
@@ -28,11 +29,13 @@ class Spider:
 			table.write(0, 5, u'违规行为')
 			table.write(0, 6, u'批复内容')
 			table.write(0, 7, u'处理人')
+			table.write(0, 8, u'网络链接')
+			table.write(0, 9, u'本地链接')
 
 			punishFile.save(fileName)
 			self.beginRow = 1
 
-	def GetPage(self, urlNumber, table):
+	def GetPage(self, urlNumber, table, fileDir):
 		punishUrl = "http://vip.stock.finance.sina.com.cn/corp/go.php/vGP_GetOutOfLine/stockid/" + urlNumber + ".phtml?qq-pf-to=pcqq.c2c"
 		response = urllib2.urlopen(punishUrl)
 		page = response.read()
@@ -52,6 +55,16 @@ class Spider:
 		replyContents = re.findall(r'批复内容</strong></td><td>(.*?)</td>', utf8Page, re.S)
 		handlers = re.findall(r'处理人</strong></td><td>(.*?)</td>', utf8Page, re.S)
 
+		'''Save HTML files'''
+		tempPage = page.replace("href=\"/corp", "href=\"corp")
+		newPage = tempPage.replace("src=\"/corp", "href=\"corp")
+		fileNameHtml = urlNumber + '_' + "".join(companys[0].decode('utf-8').split()) + '_' + times[0] + ".html"
+		filePathHtml = fileDir + "/" + fileNameHtml
+		htmlFile = open(filePathHtml, 'w')
+		htmlFile.write(newPage)
+		htmlFile.close()
+
+		'''Write Excel record'''
 		date_format = xlwt.XFStyle()
 		date_format.num_format_str = 'yyyy/mm/dd'
 
@@ -67,13 +80,17 @@ class Spider:
 			table.write( row, 5, "".join(illegalBehaviors[i].decode('utf-8').replace('&nbsp;', '').split()))
 			table.write( row, 6, "".join(replyContents[i].decode('utf-8').replace('&nbsp;', '').split()))
 			table.write( row, 7, "".join(handlers[i].decode('utf-8').split()))
+			table.write( row, 8, punishUrl+' ')
+			table.write( row, 9, filePathHtml+' ')
 			row = row + 1
 			i = i + 1
 
 		self.beginRow = row
 
+		
 
-def read_run(codeName, fileName):
+
+def read_run(codeName, fileName, fileDir):
 	spider = Spider(fileName)
 	rb = open_workbook(fileName)
 	wb = copy(rb)
@@ -82,10 +99,10 @@ def read_run(codeName, fileName):
 	with open(codeName, 'r') as fo:
 		for line in fo.readlines():
 			print line.strip()
-			spider.GetPage(line.strip(), table)
+			spider.GetPage(line.strip(), table, fileDir)
 
 	wb.save(fileName)
 
 if __name__ == '__main__':
-	read_run(sys.argv[1], sys.argv[2])
+	read_run(sys.argv[1], sys.argv[2], sys.argv[3])
 	# read_run('shenzhen_code', 'shenzhen.xls')
