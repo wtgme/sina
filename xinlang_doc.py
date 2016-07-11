@@ -105,4 +105,4 @@ def read_run(codeName, fileName, fileDir):
 
 if __name__ == '__main__':
 	read_run(sys.argv[1], sys.argv[2], sys.argv[3])
-	# read_run('shenzhen_code', 'shenzhen.xls')
+	# read_run('shenzhen_code', 'shenzhen.xls', 'shenzhen')
