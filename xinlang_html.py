@@ -38,6 +38,7 @@ def run(codeName, fileDir):
 			print line.strip()
 			spider.GetPage(line.strip(), fileDir)
 
+
 if __name__ == '__main__':
 	run(sys.argv[1], sys.argv[2])
 	# run('shenzhen_code',  'shenzhen')
