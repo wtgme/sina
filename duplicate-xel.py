@@ -34,7 +34,7 @@ def check(last_rec, cur_rec, mode):
     common = long_substr([last_rec[6], cur_rec[6]])
     key = re.sub('[0-9]+', '', common)
     t1, t2 = xldate.xldate_as_datetime(last_rec[2], mode), xldate.xldate_as_datetime(cur_rec[2], mode)
-    if len(key)>7 and abs(t1.year-t2.year)<=2:
+    if len(key)>=7 and abs(t1.year-t2.year)<=2:
         return str(int(cur_rec[0]))+u':'+key
     else:
         return u'None'
