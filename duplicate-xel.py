@@ -70,7 +70,7 @@ def label_dum(file_name,outfile):
 
     init_id = table.cell(1, 1)
     row_list = []
-    for row_idx in range(1, row_num):
+    for row_idx in range(1, row_num+1):
         if table.cell(row_idx, 1).value == init_id:
             row_list.append(table.row_values(row_idx))
         else:
