@@ -70,7 +70,7 @@ def label_dum(file_name,outfile):
 
     init_id = table.cell(1, 1)
     row_list = []
-    for row_idx in range(1, row_num+1):
+    for row_idx in range(1, row_num):
         if table.cell(row_idx, 1).value == init_id:
             row_list.append(table.row_values(row_idx))
         else:
@@ -83,6 +83,12 @@ def label_dum(file_name,outfile):
             init_id = table.cell(row_idx, 1).value
             row_list = []
             row_list.append(table.row_values(row_idx))
+    if len(row_list) > 1:
+        process(otable, idata.datemode, row_index, row_list)
+    else:
+        for col_index, cell_value in enumerate(table.row_values(row_num-1)):
+            otable.write(row_index, col_index, cell_value)
+    row_index += len(row_list)
 
     odata.save(outfile)
 
