@@ -31,7 +31,7 @@ def stock_home(stockUrl):
     tokens = event.split('/')
     stockid = tokens[2]
     ido = tokens[-1].replace('.html', '')
-    print event, stockid, ido
+    # print event, stockid, ido
     years = range(2001, 2017)
     for year in years[::-1]:
         GetPage(stockid, str(year), ido)
