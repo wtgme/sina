@@ -6,11 +6,35 @@ Created on 11:16 AM, 8/27/16
 Spider for http://quote.cfi.cn/quote.aspx?stockid=3&contenttype=zdsj&jzrq=2001
 """
 
-import re
 from lxml import html
 import requests
 from datetime import datetime
-import sys
+
+
+def start():
+    startUrl = 'http://quote.cfi.cn/stockList.aspx'
+    page = requests.get(startUrl)
+    tree = html.fromstring(page.content)
+
+    stocks_lists = tree.xpath('//*[@id="divcontent"]/table/tr')
+    for stocks_list in stocks_lists:
+        stocks = stocks_list.xpath('./td')
+        for stock in stocks:
+            stockUrl = stock.xpath('./a/@href')[0]
+            stock_home(stockUrl)
+
+
+def stock_home(stockUrl):
+    home = requests.get('http://quote.cfi.cn/'+stockUrl)
+    tree = html.fromstring(home.content)
+    event = tree.xpath('//*[@id="nodea32"]/nobr/a/@href')[0]
+    tokens = event.split('/')
+    stockid = tokens[2]
+    ido = tokens[-1].replace('.html', '')
+    print event, stockid, ido
+    years = range(2001, 2017)
+    for year in years[::-1]:
+        GetPage(stockid, str(year), ido)
 
 
 def GetPage(stockid, year, ido):
@@ -39,38 +63,5 @@ def GetPage(stockid, year, ido):
         # print ''.join(content.split())
 
 
-
-def read_need():
-    idlist, idmap = [], {}
-    with open('zhongcai.txt', 'r') as fo:
-        for line in fo.readlines():
-            tokens = line.strip().split()
-            for token in tokens:
-                v = re.findall(r'\d+', token)[0]
-                idmap[v] = len(idmap) + 1
-    with open('need.txt', 'r') as fo:
-        for line in fo.readlines():
-            idlist.append(line.strip())
-    zxid = []
-    for uid in idlist:
-        stockid = idmap.get(uid, None)
-        if stockid:
-            zxid.append((uid, stockid))
-        else:
-            pass
-
-    return zxid
-
-
-def read_run(idlist, years):
-    for ido, idxc in idlist:
-        for year in years[::-1]:
-            # print '------------------------------------'
-            GetPage(str(idxc), str(year), ido)
-
-
 if __name__ == '__main__':
-    years = range(2001, 2017)
-    idlist = read_need()
-    read_run(idlist, years)
-# read_run('shenzhen_code', 'shenzhen.xls', 'shenzhen')
+    start()
