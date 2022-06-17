@@ -6,7 +6,7 @@ import sys
 class Spider:
 
 	def GetPage(self, urlNumber, fileDir):
-		punishUrl = "http://vip.stock.finance.sina.com.cn/corp/go.php/vGP_GetOutOfLine/stockid/" + urlNumber + ".phtml?qq-pf-to=pcqq.c2c"
+		punishUrl = "http://vip.stock.finance.sina.com.cn/corp/go.php/vGP_GetOutOfLine/stockid/" + urlNumber + ".phtml"
 		response = urllib2.urlopen(punishUrl)
 		page = response.read()
 		unicodePage = page.decode("gb2312", 'ignore')
